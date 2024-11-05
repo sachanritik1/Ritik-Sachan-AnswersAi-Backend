@@ -15,11 +15,8 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
         email: z.string().email(),
         password: z.string().min(6).max(30),
     })
-    const result = loginSchema.safeParse(req.body)
-    if (!result.success) {
-        throw new ApiError(400, "Invalid arguments", result.error)
-    }
-    const { email, password } = result.data
+
+    const { email, password } = loginSchema.parse(req.body)
 
     if (!email) {
         throw new ApiError(400, "Please provide username or email")

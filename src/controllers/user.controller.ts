@@ -12,11 +12,8 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
         password: z.string().min(6).max(30),
         fullName: z.string().min(3).max(30),
     })
-    const result = registerSchema.safeParse(req.body)
-    if (!result.success) {
-        throw new ApiError(400, "Invalid arguments", result.error)
-    }
-    const { email, password, fullName } = result.data
+
+    const { email, password, fullName } = registerSchema.parse(req.body)
     const existedUser = await prisma.user.findUnique({
         where: {
             email,
@@ -78,12 +75,20 @@ const getUserById = asyncHandler(async (req: Request, res: Response) => {
 
 const getQuestionsByUserId = asyncHandler(
     async (req: Request, res: Response) => {
-        const bodySchema = z.object({
-            limit: z.number().int().positive().default(10),
-            offset: z.number().int().positive().default(0),
+        const stringToNumberSchema = z.string().transform((val) => {
+            const number = parseFloat(val)
+            if (isNaN(number)) {
+                throw new ApiError(400, "Invalid query parameters")
+            }
+            return number
         })
 
-        const { limit, offset } = bodySchema.parse(req.body)
+        const queryParamsSchema = z.object({
+            limit: stringToNumberSchema.default("20"),
+            offset: stringToNumberSchema.default("0"),
+        })
+
+        const { limit, offset } = queryParamsSchema.parse(req.query)
 
         const userId = req.params.userId
         const questions = await prisma.question.findMany({

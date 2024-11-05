@@ -10,6 +10,6 @@ const questionRouter = Router()
 
 questionRouter.use(verifyJWT)
 questionRouter.route("/").post(getAnswerByAI)
-questionRouter.route("/:questionId").post(getQuestionsById)
+questionRouter.route("/:questionId").get(getQuestionsById)
 
 export default questionRouter

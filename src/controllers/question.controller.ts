@@ -11,13 +11,7 @@ const getAnswerByAI = asyncHandler(async (req: Request, res: Response) => {
         question: z.string().min(3),
     })
 
-    const result = questionSchema.safeParse(req.body)
-
-    if (!result.success) {
-        throw new ApiError(400, "Invalid arguments", result.error)
-    }
-
-    const { question } = result.data
+    const { question } = questionSchema.parse(req.body)
 
     const completion = await llm.invoke(question)
 

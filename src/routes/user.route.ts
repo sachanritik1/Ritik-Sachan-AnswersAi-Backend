@@ -13,6 +13,6 @@ userRouter.route("/").post(registerUser)
 
 userRouter.use(verifyJWT)
 userRouter.route("/:userId").get(getUserById)
-userRouter.route("/:userId/questions").post(getQuestionsByUserId)
+userRouter.route("/:userId/questions").get(getQuestionsByUserId)
 
 export default userRouter
