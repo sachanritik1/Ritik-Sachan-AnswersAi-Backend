@@ -27,7 +27,8 @@ model User {
 
 model Question {
   id        String    @id @default(uuid())
-  content   String
+  questionString   String
+  answerString     String
   userId    String 
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
