@@ -3,7 +3,7 @@ import { ApiError } from "../utils/ApiError"
 import { NextFunction, Request } from "express"
 import jwt from "jsonwebtoken"
 import { Response } from "express"
-import { prisma } from "../db/db"
+import { prisma } from "../clients/prisma"
 
 export const verifyJWT = asyncHandler(
     async (req: Request, _: Response, next: NextFunction) => {
@@ -11,7 +11,6 @@ export const verifyJWT = asyncHandler(
             const token =
                 req?.cookies?.accessToken ||
                 req?.headers?.authorization?.split(" ")[1]
-            console.log(token)
 
             if (!token) {
                 throw new ApiError(404, "Unauthorized request")
@@ -19,7 +18,7 @@ export const verifyJWT = asyncHandler(
 
             const decodedToken = jwt.verify(
                 token,
-                process.env.ACCESS_TOKEN_SECRET || "secret"
+                process.env.ACCESS_TOKEN_SECRET || "1234"
             )
 
             if (!decodedToken || typeof decodedToken === "string") {
@@ -33,13 +32,14 @@ export const verifyJWT = asyncHandler(
                 where: { id: decodedToken.id },
                 select: { id: true },
             })
+
             if (!user) {
-                throw new ApiError(401, "Invalid access token")
+                throw new ApiError(401, "User not found. Invalid access token")
             }
             req.headers["userId"] = user.id
             next()
         } catch (error) {
-            throw new ApiError(401, "Invalid access token")
+            throw new ApiError(401, "Invalid access token", error)
         }
     }
 )

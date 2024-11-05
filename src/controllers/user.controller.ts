@@ -2,7 +2,7 @@ import asyncHandler from "../utils/asyncHandler"
 import z from "zod"
 import { ApiError } from "../utils/ApiError"
 import { ApiResponse } from "../utils/ApiResponse"
-import { prisma } from "../db/db"
+import { prisma } from "../clients/prisma"
 import { getHashedPassword } from "../utils/auth"
 import { Request, Response } from "express"
 

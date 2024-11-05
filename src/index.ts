@@ -1,5 +1,5 @@
 import "dotenv/config"
-import connectDB from "./db/db"
+import connectDB from "./clients/prisma"
 const PORT: string = process.env.PORT || "5000"
 import cookieParser from "cookie-parser"
 import cors from "cors"

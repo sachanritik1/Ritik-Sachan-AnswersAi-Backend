@@ -3,7 +3,8 @@ import z from "zod"
 import { ApiError } from "../utils/ApiError"
 import { ApiResponse } from "../utils/ApiResponse"
 import { Request, Response } from "express"
-import { prisma } from "../db/db"
+import { prisma } from "../clients/prisma"
+import llm from "../clients/langchain"
 
 const getAnswerByAI = asyncHandler(async (req: Request, res: Response) => {
     const questionSchema = z.object({
@@ -18,13 +19,25 @@ const getAnswerByAI = asyncHandler(async (req: Request, res: Response) => {
 
     const { question } = result.data
 
-    //  find answer from AI
-    //  make entry in database
-    //  return answer
+    const completion = await llm.invoke(question)
+
+    const answer = completion.trim()
+
+    if (!answer) {
+        throw new ApiError(400, "AI Failed to generate answer")
+    }
+
+    const Question = await prisma.question.create({
+        data: {
+            userId: req.headers["userId"] as string,
+            questionString: question,
+            answerString: answer,
+        },
+    })
 
     return res
         .status(200)
-        .json(new ApiResponse(200, "Answer found", { answer: "" }))
+        .json(new ApiResponse(200, "Answer Generated", { question: Question }))
 })
 
 const getQuestionsById = asyncHandler(async (req: Request, res: Response) => {

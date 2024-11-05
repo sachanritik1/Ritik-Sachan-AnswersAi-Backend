@@ -4,7 +4,7 @@ import { ApiError } from "../utils/ApiError"
 import { ApiResponse } from "../utils/ApiResponse"
 import jwt from "jsonwebtoken"
 import { NextFunction, Request, Response } from "express"
-import { prisma } from "../db/db"
+import { prisma } from "../clients/prisma"
 import {
     generateAccessTokenAndRefreshToken,
     isPasswordCorrect,

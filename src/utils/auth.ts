@@ -1,7 +1,7 @@
 import { User } from "@prisma/client"
 import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken"
-import { prisma } from "../db/db"
+import { prisma } from "../clients/prisma"
 import { ApiError } from "./ApiError"
 
 export async function getHashedPassword(password: string) {
@@ -22,9 +22,9 @@ export function generateAccessToken(user: User) {
             email: user.email,
             fullName: user.fullName,
         },
-        process.env.ACCESS_TOKEN_SECRET || "secret",
+        process.env.ACCESS_TOKEN_SECRET || "1234",
         {
-            expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
+            expiresIn: process.env.ACCESS_TOKEN_EXPIRY || "1D",
         }
     )
 }
@@ -32,9 +32,9 @@ export function generateAccessToken(user: User) {
 export function generateRefreshToken(user: User) {
     return jwt.sign(
         { id: user.id },
-        process.env.REFRESH_TOKEN_SECRET || "secret",
+        process.env.REFRESH_TOKEN_SECRET || "1234",
         {
-            expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
+            expiresIn: process.env.REFRESH_TOKEN_EXPIRY || "30D",
         }
     )
 }
