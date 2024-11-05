@@ -34,19 +34,22 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
             password: hashedPassword,
             fullName,
         },
+        select: {
+            id: true,
+            email: true,
+            fullName: true,
+            createdAt: true,
+            updatedAt: true,
+        },
     })
 
     if (!createdUser) {
         throw new ApiError(500, "Something went wrong while registering user")
     }
 
-    return res.status(200).json(
-        new ApiResponse(201, "User created", {
-            id: createdUser.id,
-            email: createdUser.email,
-            fullName: createdUser.fullName,
-        })
-    )
+    return res
+        .status(200)
+        .json(new ApiResponse(201, "User created", { createdUser }))
 })
 
 const getUserById = asyncHandler(async (req: Request, res: Response) => {
@@ -55,26 +58,40 @@ const getUserById = asyncHandler(async (req: Request, res: Response) => {
         where: {
             id: userId,
         },
+        select: {
+            id: true,
+            email: true,
+            fullName: true,
+            createdAt: true,
+            updatedAt: true,
+        },
     })
     if (!user) {
         throw new ApiError(404, "User not found")
     }
     return res.status(200).json(
         new ApiResponse(200, "User found", {
-            id: user.id,
-            email: user.email,
-            fullName: user.fullName,
+            user,
         })
     )
 })
 
 const getQuestionsByUserId = asyncHandler(
     async (req: Request, res: Response) => {
+        const bodySchema = z.object({
+            limit: z.number().int().positive().default(10),
+            offset: z.number().int().positive().default(0),
+        })
+
+        const { limit, offset } = bodySchema.parse(req.body)
+
         const userId = req.params.userId
         const questions = await prisma.question.findMany({
             where: {
                 userId,
             },
+            take: limit,
+            skip: offset * limit,
         })
         return res.status(200).json(
             new ApiResponse(200, "Questions found", {
