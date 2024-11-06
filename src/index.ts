@@ -1,5 +1,4 @@
 import "dotenv/config"
-import connectDB from "./clients/prisma"
 const PORT: string = process.env.PORT || "5000"
 import cookieParser from "cookie-parser"
 import cors from "cors"
@@ -10,7 +9,6 @@ const app = express()
 
 ;(async () => {
     try {
-        await connectDB()
         app.listen(PORT, () => console.log(`Server running on port ${PORT}`))
     } catch (err) {
         console.log("SERVER RUN FAILED " + err)
@@ -32,3 +30,5 @@ app.use(cookieParser())
 
 //use routes
 app.use("/api", mainRouter)
+
+export default app
